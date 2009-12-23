@@ -3,9 +3,12 @@
 ArEnumerations is a simple Rails plugin which brings transparent enums to ActiveRecord objects. It doesn't require native database
 support for enums or sets, instead of this it stores values as plain integers.
 
+Test application could be found here: http://github.com/igorkasyanchuk/ar_enumerations_test_application.
+
 == Example
 
 ArEnumerations usage is simple:
+
 
   # Migration
   create_table :foos do |t|
