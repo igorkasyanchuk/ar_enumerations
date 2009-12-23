@@ -7,6 +7,13 @@ support for enums or sets, instead of this it stores values as plain integers.
 
 ArEnumerations usage is simple:
 
+  # Migration
+  create_table :foos do |t|
+    t.column :days, :integer
+    t.column :selected_day, :integer
+  end
+
+  # Model
   class Foo < ActiveRecord::Base
     MONDAY = "Monday"
     FRIDAY = "Friday"
@@ -69,4 +76,4 @@ ArEnumerations columns will handle all incorrect (unspecified) values as +nil+:
 Copyright (c) 2009 Igor Kasyanchuk (igorkasyanchuk at gmail dot com), released under the MIT license.
 Feel free to mail me with any questions regarding this plugin.
 
-PS: As a tutorial for this plugin was used magic_numbers plugin.
+PS: As a tutorial for this plugin was used magic_numbers plugin: http://github.com/sotakone/magic_numbers.
