@@ -19,7 +19,13 @@ module ActiveRecord
         else
           raise ArgumentError, "Could not find enumeration attribute `#{name}` in class #{self.class.name}"
         end
-      end      
+      end
+      
+      def enumeration_attribute_db_value(name, values)
+        attribute_options = enumeration_attribute_options(name)
+        value = values.is_a?(Array) ? values.map(&:to_s) : [values].map(&:to_s)
+        (value & attribute_options[:values]).map { |r| 2**attribute_options[:values].index(r) }.sum
+      end
 
     protected
     
@@ -39,7 +45,7 @@ module ActiveRecord
         write_inheritable_attribute(:enumeration_attributes, enumeration_attributes)
         enumeration_accessors(name)
       end
-
+      
     end
 
     module InstanceMethods
@@ -59,9 +65,7 @@ module ActiveRecord
       end
 
       def enumeration_write(name, new_value)
-        attribute_options = self.class.enumeration_attribute_options(name)
-        value = new_value.is_a?(Array) ? new_value.map(&:to_s) : [new_value].map(&:to_s)
-        self[name] = (value & attribute_options[:values]).map { |r| 2**attribute_options[:values].index(r) }.sum
+        self[name] = self.class.enumeration_attribute_db_value(name, new_value)
         new_value
       end
       

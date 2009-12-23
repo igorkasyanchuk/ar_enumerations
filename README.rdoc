@@ -1,78 +1,72 @@
-= ArEnumeration plugin
+= ArEnumerations plugin
 
-Magic Numbers is a simple Rails plugin which brings transparent enums
-and sets (bitfields) to AR objects. It doesn't require native database
-support for enums or sets, instead of this it stores values as plain
-integers.
+ArEnumerations is a simple Rails plugin which brings transparent enums to ActiveRecord objects. It doesn't require native database
+support for enums or sets, instead of this it stores values as plain integers.
 
 == Example
 
-Magic Numbers usage is simple:
+ArEnumerations usage is simple:
 
-  class User < ActiveRecord::Base
-    enum_attribute     :state, :values => [:passive, :active, :deleted]
-    bitfield_attribute :roles, :values => [:user, :moderator, :administrator]
+  class Foo < ActiveRecord::Base
+    MONDAY = "Monday"
+    FRIDAY = "Friday"
+    SUNDAY = "Sunday"
+
+    DAYS = [MONDAY, FRIDAY, SUNDAY]
+
+    enumeration_for :days, DAYS
+    enumeration_for :selected_day, DAYS, :single => true
   end
 
-After this you can set user's state with symbols or strings:
+After this you can set foo's days with strings:
 
-  @user.state
+  @foot.days
   # => nil
 
-  @user.state = :active
-  @user.state = 'deleted'
+  @foo.days = Foo::DAYS
+  @foo.selected_day = Foo::MONDAY
 
-  @user.state
-  # => :deleted
+  @foo.days
+  # => ["Monday", "Friday", "Sunday"]
 
-  @user[:state]  # In such way you can get value which will actually be stored in DB
+  @foo[:days]  # In such way you can get value which will actually be stored in DB
   # => 2
 
 And you can work with bitfield attributes as regular arrays:
 
-  @user.roles
+  @foo.selected_day
   # => nil
 
-  @user.roles = [:user]
-  @user.roles
-  # => [:user]
+  @foo.selected_day = Foo::MONDAY
+  @user.selected_day
+  # => "Monday"
 
-  @user.roles <<= :moderator
-  @user.roles
-  # => [:user, :moderator]
+==  Getting ArEnumeration value for specified values
 
-  @user[:roles]
-  # => 3
+Sometimes (for example, in search queries) you need to ArEnumeration value.
 
-==  Getting magic numbers for specified values
-
-Sometimes (for example, in search queries) you need to get magic
-numbers which corresponds to specific values. You can use
-+magic_number_for+ method for this, i.e.:
-
-  deleted_users = @user.find(:all, :conditions => { :state => User.magic_number_for(:state, :deleted) })
-
-Also you can get entire magic number attribute options hash by it's name:
-
-  User.magic_number_attribute_options(:state)
-  # => { :type               => :enum,
-         :values             => [:passive,  :active,  :deleted],
-         :stringified_values => ["passive", "active", "deleted"] }
+  class Foo < ActiveRecord::Base
+    validates_presence_of :name
+    MONDAY = "Monday"
+    FRIDAY = "Friday"
+    SUNDAY = "Sunday"
+    DAYS = [MONDAY, FRIDAY, SUNDAY]
+    enumeration_for :days, DAYS
+    enumeration_for :selected_day, DAYS, :single => true
+    named_scope :sundays, :conditions => { :selected_day => enumeration_attribute_db_value(:selected_day, Foo::SUNDAY) }
+  end
 
 == Handling of incorrect values
 
-Magic-numbered columns will handle all incorrect (unspecified) values as +nil+:
+ArEnumerations columns will handle all incorrect (unspecified) values as +nil+:
 
-  @user.state = 'incorrect state value'
-  @user.state
+  @foo.selected_day = 'other day'
+  @foo.selected_day
   # => nil
-
-  @user.roles = [:user, nil, :dancer] # NB :dancer is an incorrect role
-  @user.roles
-  # => [:user]
 
 == Copyrights
 
-Copyright (c) 2009 Mikhail Lapshin (sotakone at sotakone dot com), released under the MIT license.
-
+Copyright (c) 2009 Igor Kasyanchuk (igorkasyanchuk at gmail dot com), released under the MIT license.
 Feel free to mail me with any questions regarding this plugin.
+
+PS: As a tutorial for this plugin was used magic_numbers plugin.
