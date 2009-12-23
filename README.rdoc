@@ -48,7 +48,7 @@ And you can work with bitfield attributes as regular arrays:
   # => nil
 
   @foo.selected_day = Foo::MONDAY
-  @user.selected_day
+  @foo.selected_day
   # => "Monday"
 
 ==  Getting ArEnumeration value for specified values
